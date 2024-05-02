@@ -1,0 +1,11 @@
+/Users/sandwich1991/Desktop/unisocket/Client/bin/Release/Client.exe
+/Users/sandwich1991/Desktop/unisocket/Client/bin/Release/Client.pdb
+/Users/sandwich1991/Desktop/unisocket/Client/bin/Release/unisocket.dll
+/Users/sandwich1991/Desktop/unisocket/Client/bin/Release/websocket-sharp.dll
+/Users/sandwich1991/Desktop/unisocket/Client/bin/Release/unisocket.pdb
+/Users/sandwich1991/Desktop/unisocket/Client/bin/Release/websocket-sharp.xml
+/Users/sandwich1991/Desktop/unisocket/Client/obj/Release/Client.csproj.AssemblyReference.cache
+/Users/sandwich1991/Desktop/unisocket/Client/obj/Release/Client.csproj.CoreCompileInputs.cache
+/Users/sandwich1991/Desktop/UniSocket/Client/obj/Release/Client.csproj.CopyComplete
+/Users/sandwich1991/Desktop/unisocket/Client/obj/Release/Client.exe
+/Users/sandwich1991/Desktop/unisocket/Client/obj/Release/Client.pdb
