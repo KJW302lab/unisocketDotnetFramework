@@ -1,3 +1,5 @@
+using System;
+
 namespace LAB302
 {
     public interface IConnectCallback
@@ -17,6 +19,6 @@ namespace LAB302
 
     public interface IReceiveCallback
     {
-        void OnReceive(byte[] buffer);
+        void OnReceive(int transferred, ArraySegment<byte> buffer);
     }
 }

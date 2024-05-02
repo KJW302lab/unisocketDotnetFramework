@@ -31,7 +31,10 @@ namespace LAB302
     
             try
             {
-                RaiseReceiveEvent( data.Length, ReceiveBuffer.Write(data));
+                int transferred = data.Length;
+                ReceiveBuffer.Copy(data);
+                RaiseReceiveEvent(transferred);
+                ReceiveBuffer.Read(transferred);
             }
             catch (Exception e)
             {
@@ -45,7 +48,9 @@ namespace LAB302
             
             bufferList.ForEach(buffer =>
             {
-                _socket.Send(buffer.Array);
+                byte[] array = new byte[buffer.Count];
+                Array.Copy(buffer.Array, buffer.Offset, array, 0, buffer.Count);
+                _socket.Send(array);
                 count += buffer.Count;
             });
             

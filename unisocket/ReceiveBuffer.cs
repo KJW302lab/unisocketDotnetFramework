@@ -3,80 +3,62 @@ using System;
 namespace LAB302
 {
     public class ReceiveBuffer
-{
-    private ArraySegment<byte> _buffer;
-    private int _readPos;
-    private int _writePos;
-
-    public ReceiveBuffer(int bufferSize)
     {
-        _buffer = new ArraySegment<byte>(new byte[bufferSize], 0, bufferSize);
-    }
+        private ArraySegment<byte> _buffer;
+        private int _readPos;
+        private int _writePos;
 
-    public int DataSize => _writePos - _readPos;
-    public int FreeSize => _buffer.Count - _writePos;
-    
-    public ArraySegment<byte> ReadSegment => new ArraySegment<byte>(_buffer.Array, _buffer.Offset + _readPos, DataSize);
-
-    public void Clear()
-    {
-        int dataSize = DataSize;
-        
-        if (dataSize == 0)
-            _readPos = _writePos = 0;
-        
-        else
+        public ReceiveBuffer(int bufferSize)
         {
-            Array.Copy(_buffer.Array, _buffer.Offset + _readPos, _buffer.Array, _buffer.Offset, dataSize);
-            _readPos = 0;
-            _writePos = dataSize;
-        }
-    }
-
-    public ArraySegment<byte> Reserve()
-    {
-        return new ArraySegment<byte>(_buffer.Array, _buffer.Offset + _writePos, FreeSize);
-    }
-
-    public bool Write(byte[] array)
-    {
-        if (_buffer.Count < array.Length)
-        {
-            Errors.PrintError($"Data to write is too large than receive buffer. (buffer size : {_buffer.Count} data size : {array.Length}");
-            return false;
+            _buffer = new ArraySegment<byte>(new byte[bufferSize], 0, bufferSize);
         }
 
-        if (FreeSize < array.Length)
+        public int DataSize => _writePos - _readPos;
+        public int FreeSize => _buffer.Count - _writePos;
+        
+        public ArraySegment<byte> ReadSegment => new ArraySegment<byte>(_buffer.Array, _buffer.Offset + _readPos, DataSize);
+        public ArraySegment<byte> WriteSegment => new ArraySegment<byte>(_buffer.Array, _buffer.Offset + _writePos, FreeSize);
+
+        public void Clear()
         {
-            if (DataSize + array.Length > _buffer.Count)
-            {
-                Errors.PrintError($"Data to write is too large than receive buffer's FreeSize.");
-                return false;
-            }
+            int dataSize = DataSize;
             
-            Clear();
+            if (dataSize == 0)
+                _readPos = _writePos = 0;
+            
+            else
+            {
+                Array.Copy(_buffer.Array, _buffer.Offset + _readPos, _buffer.Array, _buffer.Offset, dataSize);
+                _readPos = 0;
+                _writePos = dataSize;
+            }
         }
 
-        Array.Copy(
-            sourceArray: array,
-            sourceIndex: 0,
-            destinationArray: _buffer.Array,
-            destinationIndex: _buffer.Offset + _writePos,
-            length: array.Length
-        );
+        public void Copy(byte[] array)
+        {
+            if (Write(array.Length) == false)
+                return;
 
-        _writePos += array.Length;
+            Array.Copy(array, 0, _buffer.Array, _buffer.Offset + _readPos, array.Length);
+        }
 
-        return true;
+        public bool Write(int bytesToWrite)
+        {
+            if (bytesToWrite > FreeSize)
+                return false;
+
+            _writePos += bytesToWrite;
+
+            return true;
+        }
+
+        public bool Read(int bytesToRead)
+        {
+            if (bytesToRead > DataSize)
+                return false;
+
+            _readPos += bytesToRead;
+            return true;
+        }
     }
-
-    public bool Read(int bytesToRead)
-    {
-        if (bytesToRead > DataSize)
-            return false;
-
-        _readPos += bytesToRead;
-        return true;
-    }
-}
 }

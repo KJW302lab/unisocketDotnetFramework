@@ -26,7 +26,7 @@ namespace LAB302
 
         public event Action ConnectEvent;
         public event Action DisconnectEvent;
-        public event Action<byte[]> ReceiveEvent;
+        public event Action<int, ArraySegment<byte>> ReceiveEvent;
         public event Action<int> SendEvent; 
 
         public void Send(ArraySegment<byte> buffer)
@@ -84,26 +84,14 @@ namespace LAB302
             _disconnectCallbacks.ForEach(callback => callback.OnDisconnected());
         }
 
-        protected void RaiseReceiveEvent(int transferred, bool succeed)
+        protected void RaiseReceiveEvent(int transferred)
         {
             try
             {
-                if (succeed == false)
-                {
-                    Errors.PrintError($"Receive Failed : Receive Buffer not enough");
-                    return;
-                }
-
-                var readSegment = ReceiveBuffer.ReadSegment;
-
-                byte[] arr = new byte[transferred];
-
-                for (int i = 0; i < transferred; i++)
-                    if (readSegment.Array != null)
-                        arr[i] = readSegment.Array[i];
-
-                ReceiveEvent?.Invoke(arr);
-                _receiveCallbacks.ForEach(callback => callback.OnReceive(arr));
+                var buffer = ReceiveBuffer.ReadSegment;
+                
+                ReceiveEvent?.Invoke(transferred, buffer);
+                _receiveCallbacks.ForEach(callback => callback.OnReceive(transferred, buffer));
             }
             catch (Exception e)
             {

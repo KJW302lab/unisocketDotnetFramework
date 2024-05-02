@@ -26,7 +26,7 @@ namespace LAB302
         void RegisterReceive()
         {
             ReceiveBuffer.Clear();
-            var segment = ReceiveBuffer.Reserve();
+            var segment = ReceiveBuffer.WriteSegment;
             _recvArgs.SetBuffer(segment.Array, segment.Offset, segment.Count);
 
             try
@@ -48,7 +48,12 @@ namespace LAB302
             try
             {
                 if (error != SocketError.Success || args.BytesTransferred <= 0) return;
-                RaiseReceiveEvent(args.BytesTransferred, true);
+
+                int transferred = args.BytesTransferred;
+                
+                ReceiveBuffer.Write(transferred);
+                RaiseReceiveEvent(transferred);
+                ReceiveBuffer.Read(transferred);
                 RegisterReceive();
             }
             catch (Exception e)
