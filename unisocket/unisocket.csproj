@@ -43,7 +43,6 @@
     <ItemGroup>
         <Compile Include="Errors.cs" />
         <Compile Include="Interfaces.cs" />
-        <Compile Include="NetworkBehaviour.cs" />
         <Compile Include="ReceiveBuffer.cs" />
         <Compile Include="SocketInitiailizer.cs" />
         <Compile Include="TCP\UniSocket_Tcp.cs" />

@@ -1,9 +1,0 @@
-/Users/sandwich1991/Desktop/unisocket/unisocket/bin/Release/unisocket.dll
-/Users/sandwich1991/Desktop/unisocket/unisocket/bin/Release/unisocket.pdb
-/Users/sandwich1991/Desktop/unisocket/unisocket/bin/Release/websocket-sharp.dll
-/Users/sandwich1991/Desktop/unisocket/unisocket/bin/Release/websocket-sharp.xml
-/Users/sandwich1991/Desktop/unisocket/unisocket/obj/Release/unisocket.csproj.AssemblyReference.cache
-/Users/sandwich1991/Desktop/unisocket/unisocket/obj/Release/unisocket.csproj.CoreCompileInputs.cache
-/Users/sandwich1991/Desktop/UniSocket/unisocket/obj/Release/unisocket.csproj.CopyComplete
-/Users/sandwich1991/Desktop/unisocket/unisocket/obj/Release/unisocket.dll
-/Users/sandwich1991/Desktop/unisocket/unisocket/obj/Release/unisocket.pdb

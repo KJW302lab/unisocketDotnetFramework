@@ -39,17 +39,9 @@ namespace LAB302
                 return;
             }
 
-            var connectedSocket = args.AcceptSocket;
-
-            if (connectedSocket == null)
-            {
-                Errors.PrintError($"There is no ConnectSocket in args : {args.AcceptSocket}");
-                return;
-            }
-
             var callback = (Action<UniSocket>)args.UserToken;
         
-            callback.Invoke(new UniSocket_Tcp(connectedSocket));
+            callback.Invoke(new UniSocket_Tcp(_connectSocket));
         }
     }
 }
