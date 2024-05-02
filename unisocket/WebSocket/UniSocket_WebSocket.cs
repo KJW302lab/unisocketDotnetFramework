@@ -19,7 +19,7 @@ namespace LAB302
             RemoteEndPoint = endPoint;
         }
     
-        void OnMessage(object? sender, MessageEventArgs args)
+        void OnMessage(object sender, MessageEventArgs args)
         {
             var data = args.RawData;
     

@@ -7,20 +7,20 @@ namespace LAB302
     {
         public string RemoteEndPoint { get; protected set; }
         
-        private static List<UniSocketListener>  _listeners = new();
-        private static List<UniSocketConnector> _connectors = new();
-        private static List<NetworkBehaviour>   _behaviours = new();
+        private static List<UniSocketListener>  _listeners = new List<UniSocketListener>();
+        private static List<UniSocketConnector> _connectors = new List<UniSocketConnector>();
+        private static List<NetworkBehaviour>   _behaviours = new List<NetworkBehaviour>();
 
         public static void Listen(SocketInitializer initializer, Action<UniSocket> acceptedSocket)
         {
             if (initializer.NetworkMethod == NetworkMethod.TCP)
             {
-                UniSocket_TcpListener listener = new(initializer.IpAddress, initializer.Port, acceptedSocket);
+                UniSocket_TcpListener listener = new UniSocket_TcpListener(initializer.IpAddress, initializer.Port, acceptedSocket);
                 _listeners.Add(listener);
             }
             else
             {
-                UniSocket_WebSocketListener listener = new(initializer.IpAddress, initializer.Port,
+                UniSocket_WebSocketListener listener = new UniSocket_WebSocketListener(initializer.IpAddress, initializer.Port,
                     initializer.ServiceName, acceptedSocket);
                 _listeners.Add(listener);
             }
@@ -30,7 +30,7 @@ namespace LAB302
         {
             if (initializer.NetworkMethod == NetworkMethod.TCP)
             {
-                UniSocket_TcpListener listener = new(initializer.IpAddress, initializer.Port, acceptedSocket =>
+                UniSocket_TcpListener listener = new UniSocket_TcpListener(initializer.IpAddress, initializer.Port, acceptedSocket =>
                 {
                     var behaviour = behaviourFactory.Invoke();
                     behaviour.Initialize(acceptedSocket);
@@ -41,7 +41,7 @@ namespace LAB302
             }
             else
             {
-                UniSocket_WebSocketListener listener = new(initializer.IpAddress, initializer.Port,
+                UniSocket_WebSocketListener listener = new UniSocket_WebSocketListener(initializer.IpAddress, initializer.Port,
                     initializer.ServiceName, acceptedSocket =>
                     {
                         var behaviour = behaviourFactory.Invoke();
@@ -57,12 +57,12 @@ namespace LAB302
         {
             if (initializer.NetworkMethod == NetworkMethod.TCP)
             {
-                UniSocket_TcpConnector connector = new(initializer.IpAddress, initializer.Port, connectedSocket);
+                UniSocket_TcpConnector connector = new UniSocket_TcpConnector(initializer.IpAddress, initializer.Port, connectedSocket);
                 _connectors.Add(connector);
             }
             else
             {
-                UniSocket_WebSocketConnector connector = new(initializer.IpAddress, initializer.Port,
+                UniSocket_WebSocketConnector connector = new UniSocket_WebSocketConnector(initializer.IpAddress, initializer.Port,
                     initializer.ServiceName, connectedSocket);
                 
                 _connectors.Add(connector);
@@ -73,7 +73,7 @@ namespace LAB302
         {
             if (initializer.NetworkMethod == NetworkMethod.TCP)
             {
-                UniSocket_TcpConnector connector = new(initializer.IpAddress, initializer.Port, connectedSocket =>
+                UniSocket_TcpConnector connector = new UniSocket_TcpConnector(initializer.IpAddress, initializer.Port, connectedSocket =>
                 {
                     var behaviour = behaviourFactory.Invoke();
                     behaviour.Initialize(connectedSocket);
@@ -84,7 +84,7 @@ namespace LAB302
             }
             else
             {
-                UniSocket_WebSocketConnector connector = new(initializer.IpAddress, initializer.Port, initializer.ServiceName, connectedSocket =>
+                UniSocket_WebSocketConnector connector = new UniSocket_WebSocketConnector(initializer.IpAddress, initializer.Port, initializer.ServiceName, connectedSocket =>
                 {
                     var behaviour = behaviourFactory.Invoke();
                     behaviour.Initialize(connectedSocket);

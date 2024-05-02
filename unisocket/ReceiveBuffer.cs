@@ -16,7 +16,7 @@ namespace LAB302
     public int DataSize => _writePos - _readPos;
     public int FreeSize => _buffer.Count - _writePos;
     
-    public ArraySegment<byte> ReadSegment => new(_buffer.Array, _buffer.Offset + _readPos, DataSize);
+    public ArraySegment<byte> ReadSegment => new ArraySegment<byte>(_buffer.Array, _buffer.Offset + _readPos, DataSize);
 
     public void Clear()
     {

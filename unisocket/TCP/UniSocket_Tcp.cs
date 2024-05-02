@@ -7,8 +7,8 @@ namespace LAB302
     public class UniSocket_Tcp : UniSocket
     {
         private readonly Socket _socket;
-        private readonly SocketAsyncEventArgs _recvArgs = new();
-        private readonly SocketAsyncEventArgs _sendArgs = new();
+        private readonly SocketAsyncEventArgs _recvArgs = new SocketAsyncEventArgs();
+        private readonly SocketAsyncEventArgs _sendArgs = new SocketAsyncEventArgs();
 
         public UniSocket_Tcp(Socket acceptedSocket)
         {
@@ -16,7 +16,7 @@ namespace LAB302
             
             _socket = acceptedSocket;
 
-            RemoteEndPoint = _socket.RemoteEndPoint!.ToString();
+            RemoteEndPoint = _socket.RemoteEndPoint.ToString();
 
             _sendArgs.Completed += OnSendSegment;
             _recvArgs.Completed += OnReceiveSegment;
@@ -41,7 +41,7 @@ namespace LAB302
             }
         }
 
-        void OnReceiveSegment(object? sender, SocketAsyncEventArgs args)
+        void OnReceiveSegment(object sender, SocketAsyncEventArgs args)
         {
             var error = args.SocketError;
 
@@ -66,7 +66,7 @@ namespace LAB302
                 OnSendSegment(null, _sendArgs);
         }
 
-        void OnSendSegment(object? sender, SocketAsyncEventArgs args)
+        void OnSendSegment(object sender, SocketAsyncEventArgs args)
         {
             var error = args.SocketError;
             var transferred = args.BytesTransferred;

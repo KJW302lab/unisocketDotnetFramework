@@ -6,7 +6,7 @@ namespace LAB302
     {
         protected UniSocket connectedSocket;
 
-        public bool Connected => connectedSocket is { Connected: true };
+        public bool Connected => connectedSocket != null && connectedSocket.Connected;
 
         public void Initialize(UniSocket socket)
         {
@@ -38,12 +38,12 @@ namespace LAB302
         
         }
 
-        public virtual void OnSend(object sender, int bytes)
+        public virtual void OnSend(int bytes)
         {
         
         }
 
-        public virtual void OnReceive(object sender, byte[] buffer)
+        public virtual void OnReceive(byte[] buffer)
         {
         
         }

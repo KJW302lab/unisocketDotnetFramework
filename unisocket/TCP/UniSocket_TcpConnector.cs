@@ -6,17 +6,17 @@ namespace LAB302
 {
     public class UniSocket_TcpConnector : UniSocketConnector
     {
-        private Socket? _connectSocket;
+        private Socket _connectSocket;
 
         public UniSocket_TcpConnector(string ipAddress, int port, Action<UniSocket> connectedSocket)
         {
             try
             {
-                IPEndPoint endPoint = new(IPAddress.Parse(ipAddress), port);
+                IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(ipAddress), port);
 
-                _connectSocket = new(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                _connectSocket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
-                SocketAsyncEventArgs args = new();
+                SocketAsyncEventArgs args = new SocketAsyncEventArgs();
                 args.RemoteEndPoint = endPoint;
                 args.UserToken = connectedSocket;
                 args.Completed += OnConnectCompleted;
@@ -31,7 +31,7 @@ namespace LAB302
             }
         }
 
-        void OnConnectCompleted(object? sender, SocketAsyncEventArgs args)
+        void OnConnectCompleted(object sender, SocketAsyncEventArgs args)
         {
             if (args.SocketError != SocketError.Success)
             {
@@ -39,7 +39,7 @@ namespace LAB302
                 return;
             }
 
-            var connectedSocket = args.ConnectSocket;
+            var connectedSocket = args.AcceptSocket;
 
             if (connectedSocket == null)
             {
@@ -47,7 +47,7 @@ namespace LAB302
                 return;
             }
 
-            var callback = (Action<UniSocket>)args.UserToken!;
+            var callback = (Action<UniSocket>)args.UserToken;
         
             callback.Invoke(new UniSocket_Tcp(connectedSocket));
         }

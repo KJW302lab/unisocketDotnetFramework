@@ -1,3 +1,4 @@
+using System;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 
@@ -5,7 +6,7 @@ namespace LAB302
 {
     public class UniSocket_WebSocketListener : UniSocketListener
     {
-        private WebSocketServer? _ws;
+        private WebSocketServer _ws;
 
         public UniSocket_WebSocketListener(string ipAddress, int port, string serviceName, Action<UniSocket> acceptedSocket)
         {
@@ -13,7 +14,7 @@ namespace LAB302
             {
                 string url = $"ws://{ipAddress}:{port}";
 
-                _ws = new(url);
+                _ws = new WebSocketServer(url);
 
                 void Callback(WebSocket socket, string endPoint) => acceptedSocket.Invoke(new UniSocket_WebSocket(socket, endPoint));
 
@@ -32,7 +33,7 @@ namespace LAB302
 
     public class UniSocket_WebSocketServer_Service : WebSocketBehavior
     {
-        private readonly Action<WebSocket, string>? _acceptHandler;
+        private readonly Action<WebSocket, string> _acceptHandler;
 
         public UniSocket_WebSocketServer_Service(Action<WebSocket, string> onAccepted)
         {

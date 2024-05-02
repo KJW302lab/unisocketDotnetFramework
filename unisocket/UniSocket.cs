@@ -7,11 +7,11 @@ namespace LAB302
     {
         public NetworkMethod NetworkMethod { get; protected set; }
         
-        protected ReceiveBuffer ReceiveBuffer = new(65535);
+        protected ReceiveBuffer ReceiveBuffer = new ReceiveBuffer(65535);
         
-        private object _lock = new();
-        private Queue<ArraySegment<byte>> _sendQueue = new();
-        private List<ArraySegment<byte>> _pendingList = new();
+        private object _lock = new object();
+        private Queue<ArraySegment<byte>> _sendQueue = new Queue<ArraySegment<byte>>();
+        private List<ArraySegment<byte>> _pendingList = new List<ArraySegment<byte>>();
         
         protected abstract void SendBuffer(List<ArraySegment<byte>> bufferList);
         protected abstract bool IsConnected();
@@ -19,10 +19,15 @@ namespace LAB302
         
         public bool Connected => IsConnected();
 
-        private readonly List<IConnectCallback>    _connectCallbacks = new();
-        private readonly List<IDisconnectCallback> _disconnectCallbacks = new();
-        private readonly List<ISendCallback>       _sendCallbacks = new();
-        private readonly List<IReceiveCallback>    _receiveCallbacks = new();
+        private readonly List<IConnectCallback>    _connectCallbacks = new List<IConnectCallback>();
+        private readonly List<IDisconnectCallback> _disconnectCallbacks = new List<IDisconnectCallback>();
+        private readonly List<ISendCallback>       _sendCallbacks = new List<ISendCallback>();
+        private readonly List<IReceiveCallback>    _receiveCallbacks = new List<IReceiveCallback>();
+
+        public event Action ConnectEvent;
+        public event Action DisconnectEvent;
+        public event Action<byte[]> ReceiveEvent;
+        public event Action<int> SendEvent; 
 
         public void Send(ArraySegment<byte> buffer)
         {
@@ -69,13 +74,13 @@ namespace LAB302
 
         protected void RaiseConnectEvent()
         {
-            ConnectEvent?.Invoke(this, EventArgs.Empty);
+            ConnectEvent?.Invoke();
             _connectCallbacks.ForEach(callback => callback.OnConnect());
         }
 
         protected void RaiseDisconnectEvent()
         {
-            DisconnectEvent?.Invoke(this, EventArgs.Empty);
+            DisconnectEvent?.Invoke();
             _disconnectCallbacks.ForEach(callback => callback.OnDisconnected());
         }
 
@@ -94,9 +99,10 @@ namespace LAB302
                 byte[] arr = new byte[transferred];
 
                 for (int i = 0; i < transferred; i++)
-                    arr[i] = readSegment.Array![i];
+                    if (readSegment.Array != null)
+                        arr[i] = readSegment.Array[i];
 
-                ReceiveEvent?.Invoke(this, arr);
+                ReceiveEvent?.Invoke(arr);
                 _receiveCallbacks.ForEach(callback => callback.OnReceive(arr));
             }
             catch (Exception e)
@@ -107,7 +113,7 @@ namespace LAB302
 
         protected void RaiseSendEvent(int transferred)
         {
-            SendEvent?.Invoke(this, transferred);
+            SendEvent?.Invoke(transferred);
             _sendCallbacks.ForEach(callback => callback.OnSend(transferred));
         }
 
@@ -124,7 +130,7 @@ namespace LAB302
             }
         }
 
-        public void AddConnectCallback(IConnectCallback? callback)
+        public void AddConnectCallback(IConnectCallback callback)
         {
             if (callback == null)
                 return;
@@ -133,7 +139,7 @@ namespace LAB302
                 _connectCallbacks.Add(callback);
         }
         
-        public void AddDisconnectCallback(IDisconnectCallback? callback)
+        public void AddDisconnectCallback(IDisconnectCallback callback)
         {
             if (callback == null)
                 return;
@@ -142,7 +148,7 @@ namespace LAB302
                 _disconnectCallbacks.Add(callback);
         }
         
-        public void AddSendCallback(ISendCallback? callback)
+        public void AddSendCallback(ISendCallback callback)
         {
             if (callback == null)
                 return;
@@ -151,7 +157,7 @@ namespace LAB302
                 _sendCallbacks.Add(callback);
         }
         
-        public void AddReceiveCallback(IReceiveCallback? callback)
+        public void AddReceiveCallback(IReceiveCallback callback)
         {
             if (callback == null)
                 return;

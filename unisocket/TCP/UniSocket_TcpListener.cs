@@ -6,15 +6,15 @@ namespace LAB302
 {
     public class UniSocket_TcpListener : UniSocketListener
     {
-        private readonly Socket?           _listenSocket;
+        private readonly Socket            _listenSocket;
         private readonly IPEndPoint        _endPoint;
         private readonly Action<UniSocket> _onAccetpted;
     
         public UniSocket_TcpListener(string ipAddress, int port, Action<UniSocket> acceptedSocket)
         {
             _onAccetpted = acceptedSocket;
-            _endPoint = new(IPAddress.Parse(ipAddress), port);
-            _listenSocket = new(_endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            _endPoint = new IPEndPoint(IPAddress.Parse(ipAddress), port);
+            _listenSocket = new Socket(_endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             _listenSocket.Bind(_endPoint);
             _listenSocket.Listen(100);
             
@@ -29,7 +29,7 @@ namespace LAB302
             {
                 for (int i = 0; i < 10; i++)
                 {
-                    SocketAsyncEventArgs args = new();
+                    SocketAsyncEventArgs args = new SocketAsyncEventArgs();
                     args.Completed += OnAcceptCompleted;
     
                     bool pending = _listenSocket.AcceptAsync(args);
@@ -43,7 +43,7 @@ namespace LAB302
             }
         }
         
-        void OnAcceptCompleted(object? sender, SocketAsyncEventArgs args)
+        void OnAcceptCompleted(object sender, SocketAsyncEventArgs args)
         {
             if (args.SocketError != SocketError.Success)
             {

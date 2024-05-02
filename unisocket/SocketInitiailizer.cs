@@ -40,7 +40,7 @@ namespace LAB302
             IpAddress = ipAddress;
             Port = port;
 
-            if (serviceName.StartsWith('/') == false)
+            if (serviceName.StartsWith("/") == false)
                 serviceName = "/" + serviceName;
         
             ServiceName = serviceName;
