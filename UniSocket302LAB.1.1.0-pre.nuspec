@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>UniSocket302LAB</id>
+    <version>1.1.0-pre</version>
+    <title>UniSocket</title>
+    <authors>Sandwich1991</authors>
+    <owners></owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <projectUrl>https://github.com/KJW302lab/unisocketDotnetFramework</projectUrl>
+    <description>Socket, WebSocket Wrapper</description>
+    <releaseNotes>Update Exception Handle</releaseNotes>
+    <copyright>302LAB</copyright>
+    <tags>Socket WebSocket UniSocket</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework3.5">
+        <dependency id="WebSocketSharp" version="1.0.3-rc11" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
