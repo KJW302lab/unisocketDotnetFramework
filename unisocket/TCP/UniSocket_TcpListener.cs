@@ -39,29 +39,30 @@ namespace LAB302
             }
             catch (Exception e)
             {
-                Errors.PrintError($"{e}");
+                e.Print();
             }
         }
         
         void OnAcceptCompleted(object sender, SocketAsyncEventArgs args)
         {
-            if (args.SocketError != SocketError.Success)
+            try
             {
-                Errors.PrintError($"{args.SocketError}");
-                return;
-            }
+                if (args.SocketError != SocketError.Success)
+                    throw new UniSocketErrors(FailureType.ACCEPT_ERROR, args.SocketError);
     
-            var acceptedSocket = args.AcceptSocket;
+                var acceptedSocket = args.AcceptSocket;
+
+                if (acceptedSocket == null)
+                    throw new UniSocketErrors(FailureType.ACCEPT_ERROR, $"Accept Socket is null.");
     
-            if (acceptedSocket == null)
-            {
-                Errors.PrintError($"There is no AcceptSocket in args : {args.AcceptSocket}");
-                return;
-            }
-    
-            _onAccetpted?.Invoke(new UniSocket_Tcp(acceptedSocket));
+                _onAccetpted?.Invoke(new UniSocket_Tcp(acceptedSocket));
             
-            RegisterAccept();
+                RegisterAccept();
+            }
+            catch (UniSocketErrors e)
+            {
+                e.Print();
+            }
         }
     }
 }

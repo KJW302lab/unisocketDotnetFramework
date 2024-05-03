@@ -21,7 +21,7 @@ namespace LAB302
             }
             catch (Exception e)
             {
-                Errors.PrintError($"{e}");
+                e.Print(true);
             }
         }
     }

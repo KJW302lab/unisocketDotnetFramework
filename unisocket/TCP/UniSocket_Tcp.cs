@@ -37,7 +37,8 @@ namespace LAB302
             }
             catch (Exception e)
             {
-                Errors.PrintError($"{e}");
+                e.Print();
+                Disconnect();
             }
         }
 
@@ -47,7 +48,8 @@ namespace LAB302
 
             try
             {
-                if (error != SocketError.Success || args.BytesTransferred <= 0) return;
+                if (error != SocketError.Success || args.BytesTransferred <= 0)
+                    throw new UniSocketErrors(args.SocketError);
 
                 int transferred = args.BytesTransferred;
                 
@@ -56,19 +58,28 @@ namespace LAB302
                 ReceiveBuffer.Read(transferred);
                 RegisterReceive();
             }
-            catch (Exception e)
+            catch (UniSocketErrors e)
             {
-                Errors.PrintError($"Receive Failed : {e}");
+                e.Print();
+                Disconnect();
             }
         }
 
         protected override void SendBuffer(List<ArraySegment<byte>> bufferList)
         {
-            _sendArgs.BufferList = bufferList;
+            try
+            {
+                _sendArgs.BufferList = bufferList;
 
-            bool pending = _socket.SendAsync(_sendArgs);
-            if (pending == false)
-                OnSendSegment(null, _sendArgs);
+                bool pending = _socket.SendAsync(_sendArgs);
+                if (pending == false)
+                    OnSendSegment(null, _sendArgs);
+            }
+            catch (Exception e)
+            {
+                e.Print();
+                Disconnect();
+            }
         }
 
         void OnSendSegment(object sender, SocketAsyncEventArgs args)
@@ -81,11 +92,13 @@ namespace LAB302
                 if (transferred > 0 && error == SocketError.Success)
                     RaiseSendEvent(transferred);
                 else
-                    Errors.PrintError($"Send Error : {args.SocketError}, TransferredBytes : {transferred}");
+                    throw new UniSocketErrors(FailureType.SEND_ERROR,
+                        $"Transferred data : {transferred} SocketError : {args.SocketError}");
             }
-            catch (Exception e)
+            catch (UniSocketErrors e)
             {
-                Errors.PrintError($"Receive Failed : {e}");
+                e.Print();
+                Disconnect();
             }
         }
 

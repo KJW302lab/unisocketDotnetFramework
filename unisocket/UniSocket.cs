@@ -33,15 +33,20 @@ namespace LAB302
         {
             lock (_lock)
             {
-                if (Connected == false)
+                try
                 {
-                    Errors.PrintFailure($"Send Failed at {RemoteEndPoint} ", FailureType.CONNECTION_DISCONNECTED);
-                    return;
-                }
+                    if (Connected == false)
+                        throw new UniSocketErrors(FailureType.SEND_ERROR, $"Disconnected from {RemoteEndPoint}");
             
-                _sendQueue.Enqueue(buffer);
-                if (_pendingList.Count == 0)
-                    RegisterSend();
+                    _sendQueue.Enqueue(buffer);
+                    if (_pendingList.Count == 0)
+                        RegisterSend();
+                }
+                catch (UniSocketErrors e)
+                {
+                    e.Print();
+                    Disconnect();
+                }
             }
         }
 
@@ -63,7 +68,8 @@ namespace LAB302
             }
             catch (Exception e)
             {
-                Errors.PrintError($"{e}");
+                e.Print();
+                Disconnect();
             }
 
             finally
@@ -95,7 +101,8 @@ namespace LAB302
             }
             catch (Exception e)
             {
-                Errors.PrintError($"{e}");
+                e.Print();
+                Disconnect();
             }
         }
 

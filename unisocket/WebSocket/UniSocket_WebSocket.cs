@@ -22,39 +22,45 @@ namespace LAB302
         void OnMessage(object sender, MessageEventArgs args)
         {
             var data = args.RawData;
-    
-            if (data == null)
-            {
-                Errors.PrintError($"Receive Failed : WebSocket OnMessaged Data is null.");
-                return;
-            }
-    
+
             try
             {
+                if (data == null)
+                    throw new UniSocketErrors(FailureType.RECEIVE_ERROR, $"received data is null");
+                
                 int transferred = data.Length;
                 ReceiveBuffer.Copy(data);
                 RaiseReceiveEvent(transferred);
                 ReceiveBuffer.Read(transferred);
             }
-            catch (Exception e)
+            catch (UniSocketErrors e)
             {
-                Errors.PrintError($"Receive Failed : {e}");
+                e.Print();
+                Disconnect();
             }
         }
         
         protected override void SendBuffer(List<ArraySegment<byte>> bufferList)
         {
-            int count = 0;
-            
-            bufferList.ForEach(buffer =>
+            try
             {
-                byte[] array = new byte[buffer.Count];
-                Array.Copy(buffer.Array, buffer.Offset, array, 0, buffer.Count);
-                _socket.Send(array);
-                count += buffer.Count;
-            });
+                int count = 0;
             
-            RaiseSendEvent(count);
+                bufferList.ForEach(buffer =>
+                {
+                    byte[] array = new byte[buffer.Count];
+                    Array.Copy(buffer.Array, buffer.Offset, array, 0, buffer.Count);
+                    _socket.Send(array);
+                    count += buffer.Count;
+                });
+            
+                RaiseSendEvent(count);
+            }
+            catch (Exception e)
+            {
+                e.Print();
+                Disconnect();
+            }
         }
     
         protected override bool IsConnected()

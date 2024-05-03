@@ -27,21 +27,25 @@ namespace LAB302
             }
             catch (Exception e)
             {
-                Errors.PrintError($"{e}");
+                e.Print(true);
             }
         }
 
         void OnConnectCompleted(object sender, SocketAsyncEventArgs args)
         {
-            if (args.SocketError != SocketError.Success)
+            try
             {
-                Errors.PrintError($"{args.SocketError}");
-                return;
-            }
+                if (args.SocketError != SocketError.Success)
+                    throw new UniSocketErrors(FailureType.CONNECTION_ERROR, args.SocketError);
 
-            var callback = (Action<UniSocket>)args.UserToken;
+                var callback = (Action<UniSocket>)args.UserToken;
         
-            callback.Invoke(new UniSocket_Tcp(_connectSocket));
+                callback.Invoke(new UniSocket_Tcp(_connectSocket));
+            }
+            catch (UniSocketErrors e)
+            {
+                e.Print(true);
+            }
         }
     }
 }

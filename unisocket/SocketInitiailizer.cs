@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 
 namespace LAB302
@@ -20,30 +21,46 @@ namespace LAB302
 
         public SocketInitializer(NetworkMethod method, string ipAddress, int port)
         {
-            if (IPAddress.TryParse(ipAddress, out var address) == false)
-                Errors.PrintError($"{address} is invalid IpAddress.", true);
+            try
+            {
+                if (IPAddress.TryParse(ipAddress, out var address) == false)
+                    throw new UniSocketErrors(FailureType.IP_PARSE_ERROR, $"{ipAddress}");
 
-            _address = address;
-            NetworkMethod = method;
-            IpAddress = ipAddress;
-            Port = port;
-            ServiceName = "/";
+                _address = address;
+                NetworkMethod = method;
+                IpAddress = ipAddress;
+                Port = port;
+                ServiceName = "/";
+            }
+            catch (UniSocketErrors e)
+            {
+                e.Print();
+                throw;
+            }
         }
     
         public SocketInitializer(NetworkMethod method, string ipAddress, int port, string serviceName)
         {
-            if (IPAddress.TryParse(ipAddress, out var address) == false)
-                Errors.PrintError($"{address} is invalid IpAddress.", true);
+            try
+            {
+                if (IPAddress.TryParse(ipAddress, out var address) == false)
+                    throw new UniSocketErrors(FailureType.IP_PARSE_ERROR, $"{ipAddress}");
 
-            _address = address;
-            NetworkMethod = method;
-            IpAddress = ipAddress;
-            Port = port;
+                _address = address;
+                NetworkMethod = method;
+                IpAddress = ipAddress;
+                Port = port;
 
-            if (serviceName.StartsWith("/") == false)
-                serviceName = "/" + serviceName;
+                if (serviceName.StartsWith("/") == false)
+                    serviceName = "/" + serviceName;
         
-            ServiceName = serviceName;
+                ServiceName = serviceName;
+            }
+            catch (UniSocketErrors e)
+            {
+                e.Print();
+                throw;
+            }
         }
     }
 }
