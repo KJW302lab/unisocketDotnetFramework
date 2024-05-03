@@ -120,9 +120,6 @@ namespace LAB302
         {
             lock (_lock)
             {
-                if (Connected == false)
-                    return;
-            
                 SelfDisconnect();
                 
                 RaiseDisconnectEvent();
