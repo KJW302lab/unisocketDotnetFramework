@@ -92,18 +92,22 @@ namespace LAB302
 
         protected void RaiseReceiveEvent(int transferred)
         {
-            try
-            {
-                var buffer = ReceiveBuffer.ReadSegment;
-                
-                ReceiveEvent?.Invoke(transferred, buffer);
-                _receiveCallbacks.ForEach(callback => callback.OnReceive(transferred, buffer));
-            }
-            catch (Exception e)
-            {
-                e.Print();
-                Disconnect();
-            }
+            // try
+            // {
+            //     var buffer = ReceiveBuffer.ReadSegment;
+            //     
+            //     ReceiveEvent?.Invoke(transferred, buffer);
+            //     _receiveCallbacks.ForEach(callback => callback.OnReceive(transferred, buffer));
+            // }
+            // catch (Exception e)
+            // {
+            //     e.Print();
+            //     Disconnect();
+            // }
+            
+            var buffer = ReceiveBuffer.ReadSegment;
+            ReceiveEvent?.Invoke(transferred, buffer);
+            _receiveCallbacks.ForEach(callback => callback.OnReceive(transferred, buffer));
         }
 
         protected void RaiseSendEvent(int transferred)

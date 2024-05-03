@@ -69,7 +69,10 @@ namespace LAB302
         {
             try
             {
-                _sendArgs.BufferList = bufferList;
+                List<ArraySegment<byte>> list = new List<ArraySegment<byte>>();
+                list.AddRange(bufferList);
+
+                _sendArgs.BufferList = list;
 
                 bool pending = _socket.SendAsync(_sendArgs);
                 if (pending == false)

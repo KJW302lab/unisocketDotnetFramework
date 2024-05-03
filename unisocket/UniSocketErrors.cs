@@ -24,6 +24,11 @@ namespace LAB302
             return _msg;
         }
 
+        public static void RaiseMsg(string msg)
+        {
+            ErrorRaised?.Invoke(msg);
+        }
+
         public UniSocketErrors(object msg) : base(message: msg.ToString())
         {
             _msg = msg.ToString();
@@ -55,7 +60,10 @@ namespace LAB302
             if (needThrow)
                 throw exception;
             else
+            {
                 Console.WriteLine(exception);
+                UniSocketErrors.RaiseMsg(exception.Message);
+            }
         }
     }
 }
