@@ -28,10 +28,9 @@ namespace LAB302
                 if (data == null)
                     throw new UniSocketErrors(FailureType.RECEIVE_ERROR, $"received data is null");
                 
-                int transferred = data.Length;
                 ReceiveBuffer.Copy(data);
-                RaiseReceiveEvent(transferred);
-                ReceiveBuffer.Read(transferred);
+                var proceed = OnReceive(ReceiveBuffer.ReadSegment);
+                ReceiveBuffer.Read(proceed);
             }
             catch (UniSocketErrors e)
             {

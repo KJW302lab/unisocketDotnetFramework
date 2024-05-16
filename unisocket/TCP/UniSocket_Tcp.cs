@@ -54,8 +54,8 @@ namespace LAB302
                 int transferred = args.BytesTransferred;
                 
                 ReceiveBuffer.Write(transferred);
-                RaiseReceiveEvent(transferred);
-                ReceiveBuffer.Read(transferred);
+                var proceed = OnReceive(ReceiveBuffer.ReadSegment);
+                ReceiveBuffer.Read(proceed);
                 RegisterReceive();
             }
             catch (UniSocketErrors e)

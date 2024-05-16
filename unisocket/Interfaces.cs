@@ -19,6 +19,6 @@ namespace LAB302
 
     public interface IReceiveCallback
     {
-        void OnReceive(int transferred, ArraySegment<byte> buffer);
+        void OnReceive(ArraySegment<byte> buffer);
     }
 }

@@ -19,14 +19,9 @@ namespace LAB302
         
         public bool Connected => IsConnected();
 
-        private readonly List<IConnectCallback>    _connectCallbacks = new List<IConnectCallback>();
-        private readonly List<IDisconnectCallback> _disconnectCallbacks = new List<IDisconnectCallback>();
-        private readonly List<ISendCallback>       _sendCallbacks = new List<ISendCallback>();
-        private readonly List<IReceiveCallback>    _receiveCallbacks = new List<IReceiveCallback>();
-
         public event Action ConnectEvent;
         public event Action DisconnectEvent;
-        public event Action<int, ArraySegment<byte>> ReceiveEvent;
+        public event Action<ArraySegment<byte>> ReceiveEvent;
         public event Action<int> SendEvent; 
 
         public void Send(ArraySegment<byte> buffer)
@@ -77,43 +72,58 @@ namespace LAB302
                 _pendingList.Clear();
             }
         }
+        
+        protected int OnReceive(ArraySegment<byte> buffer)
+        {
+            int processLength = 0;
+
+            UniSocketErrors.RaiseMsg($"offset : {buffer.Offset} count : {buffer.Count}");
+
+            while (buffer.Count > 0)
+            {
+                // 최소한 헤더는 파싱할 수 있는지 확인
+                if (buffer.Count < 2)
+                    break;
+
+                // 패킷이 완전체로 도착했는지 확인
+                ushort dataSize = BitConverter.ToUInt16(buffer.Array, buffer.Offset);
+                if (buffer.Count < dataSize)
+                    break;
+                
+                UniSocketErrors.RaiseMsg($"dataSize : {dataSize}");
+            
+                // 여기까지 왔으면 패킷 조립 가능
+                ArraySegment<byte> packet = new ArraySegment<byte>(buffer.Array, buffer.Offset, dataSize);
+                RaiseReceiveEvent(packet);
+                
+                processLength += dataSize;
+
+                buffer = new ArraySegment<byte>(buffer.Array, buffer.Offset + dataSize, buffer.Count - dataSize);
+                
+                UniSocketErrors.RaiseMsg($"new offset : {buffer.Offset} count : {buffer.Count}");
+            }
+        
+            return processLength;
+        }
 
         protected void RaiseConnectEvent()
         {
             ConnectEvent?.Invoke();
-            _connectCallbacks.ForEach(callback => callback.OnConnect());
         }
 
         protected void RaiseDisconnectEvent()
         {
             DisconnectEvent?.Invoke();
-            _disconnectCallbacks.ForEach(callback => callback.OnDisconnected());
         }
 
-        protected void RaiseReceiveEvent(int transferred)
+        protected void RaiseReceiveEvent(ArraySegment<byte> buffer)
         {
-            // try
-            // {
-            //     var buffer = ReceiveBuffer.ReadSegment;
-            //     
-            //     ReceiveEvent?.Invoke(transferred, buffer);
-            //     _receiveCallbacks.ForEach(callback => callback.OnReceive(transferred, buffer));
-            // }
-            // catch (Exception e)
-            // {
-            //     e.Print();
-            //     Disconnect();
-            // }
-            
-            var buffer = ReceiveBuffer.ReadSegment;
-            ReceiveEvent?.Invoke(transferred, buffer);
-            _receiveCallbacks.ForEach(callback => callback.OnReceive(transferred, buffer));
+            ReceiveEvent?.Invoke(buffer);
         }
 
         protected void RaiseSendEvent(int transferred)
         {
             SendEvent?.Invoke(transferred);
-            _sendCallbacks.ForEach(callback => callback.OnSend(transferred));
         }
 
         public void Disconnect()
@@ -124,42 +134,6 @@ namespace LAB302
                 
                 RaiseDisconnectEvent();
             }
-        }
-
-        public void AddConnectCallback(IConnectCallback callback)
-        {
-            if (callback == null)
-                return;
-            
-            if (_connectCallbacks.Contains(callback) == false)
-                _connectCallbacks.Add(callback);
-        }
-        
-        public void AddDisconnectCallback(IDisconnectCallback callback)
-        {
-            if (callback == null)
-                return;
-            
-            if (_disconnectCallbacks.Contains(callback) == false)
-                _disconnectCallbacks.Add(callback);
-        }
-        
-        public void AddSendCallback(ISendCallback callback)
-        {
-            if (callback == null)
-                return;
-            
-            if (_sendCallbacks.Contains(callback) == false)
-                _sendCallbacks.Add(callback);
-        }
-        
-        public void AddReceiveCallback(IReceiveCallback callback)
-        {
-            if (callback == null)
-                return;
-            
-            if (_receiveCallbacks.Contains(callback) == false)
-                _receiveCallbacks.Add(callback);
         }
     }
 }
