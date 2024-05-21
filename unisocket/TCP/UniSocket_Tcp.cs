@@ -6,7 +6,7 @@ namespace LAB302
 {
     public class UniSocket_Tcp : UniSocket
     {
-        private readonly Socket _socket;
+        private Socket _socket;
         private readonly SocketAsyncEventArgs _recvArgs = new SocketAsyncEventArgs();
         private readonly SocketAsyncEventArgs _sendArgs = new SocketAsyncEventArgs();
 
@@ -107,13 +107,38 @@ namespace LAB302
 
         protected override bool IsConnected()
         {
-            return _socket.Connected;
+            try
+            {
+                return _socket.Connected;
+            }
+            catch (Exception e)
+            {
+                e.Print();
+            }
+
+            return false;
         }
 
         protected override void SelfDisconnect()
         {
-            _socket.Shutdown(SocketShutdown.Both);
-            _socket.Close();
+            if (_socket != null && _socket.Connected)
+            {
+                try
+                {
+                    _socket.Shutdown(SocketShutdown.Both);
+                    _socket.Close();
+                }
+                catch (Exception e)
+                {
+                    e.Print();
+                }
+
+                finally
+                {
+                    _socket.Close();
+                    _socket = null;
+                }
+            }
         }
     }
 }

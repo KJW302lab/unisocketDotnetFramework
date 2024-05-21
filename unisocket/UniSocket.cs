@@ -77,8 +77,6 @@ namespace LAB302
         {
             int processLength = 0;
 
-            UniSocketErrors.RaiseMsg($"offset : {buffer.Offset} count : {buffer.Count}");
-
             while (buffer.Count > 0)
             {
                 // 최소한 헤더는 파싱할 수 있는지 확인
@@ -89,9 +87,7 @@ namespace LAB302
                 ushort dataSize = BitConverter.ToUInt16(buffer.Array, buffer.Offset);
                 if (buffer.Count < dataSize)
                     break;
-                
-                UniSocketErrors.RaiseMsg($"dataSize : {dataSize}");
-            
+
                 // 여기까지 왔으면 패킷 조립 가능
                 ArraySegment<byte> packet = new ArraySegment<byte>(buffer.Array, buffer.Offset, dataSize);
                 RaiseReceiveEvent(packet);
@@ -99,8 +95,6 @@ namespace LAB302
                 processLength += dataSize;
 
                 buffer = new ArraySegment<byte>(buffer.Array, buffer.Offset + dataSize, buffer.Count - dataSize);
-                
-                UniSocketErrors.RaiseMsg($"new offset : {buffer.Offset} count : {buffer.Count}");
             }
         
             return processLength;

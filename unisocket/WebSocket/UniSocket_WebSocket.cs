@@ -64,12 +64,29 @@ namespace LAB302
     
         protected override bool IsConnected()
         {
-            return _socket.IsAlive;
+            try
+            {
+                return _socket.IsAlive;
+            }
+            catch (Exception e)
+            {
+                e.Print();
+            }
+
+            return false;
         }
     
         protected override void SelfDisconnect()
         {
-            _socket.Close();
+            try
+            {
+                _socket.Close();
+                _socket = null;
+            }
+            catch (Exception e)
+            {
+                e.Print();
+            }
         }
     }
 }
